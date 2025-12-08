@@ -901,43 +901,50 @@
 }
 
 #chat-window {
-  display: none;
+  display: none;                 /* keep only this */
   width: 320px;
   height: 420px;
   background: var(--card-bg);
   border-radius: 16px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
   margin-bottom: 10px;
-  display: flex;
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--border);
 }
+
 
 #chat-messages {
   flex: 1;
   padding: 10px;
   overflow-y: auto;
   font-size: 14px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .msg {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   padding: 8px 10px;
   border-radius: 12px;
   max-width: 90%;
   white-space: pre-wrap;
 }
 
+/* user bubble – right side */
 .msg.user {
   background: rgba(0, 217, 255, 0.15);
   align-self: flex-end;
 }
 
+/* bot bubble – left side */
 .msg.bot {
   background: rgba(148, 163, 184, 0.2);
   align-self: flex-start;
 }
+
 
 #chat-input-area {
   display: flex;
@@ -1497,7 +1504,6 @@
     });
 
     // Update year and date
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
     const now = new Date();
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('currentDate').textContent = now.toLocaleDateString('en-IN', options);
@@ -1539,10 +1545,12 @@
   const inputEl = document.getElementById("chat-input");
   const sendBtn = document.getElementById("chat-send");
 
-  toggle.onclick = () => {
-    windowEl.style.display = windowEl.style.display === "block" ? "none" : "block";
+ toggle.onclick = () => {
+  if (windowEl.style.display === "flex") {
+    windowEl.style.display = "none";
+  } else {
+    windowEl.style.display = "flex";
 
-    // Optional: show a welcome message when opened the first time
     if (!windowEl.dataset.opened) {
       windowEl.dataset.opened = "true";
       addMessage(
@@ -1550,15 +1558,19 @@
         "bot"
       );
     }
-  };
-
-  function addMessage(text, from) {
-    const div = document.createElement("div");
-    div.className = "msg " + from;
-    div.textContent = text;
-    messagesEl.appendChild(div);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
   }
+};
+
+
+ function addMessage(text, from) {
+  const div = document.createElement("div");
+  div.className = "msg " + from;
+  div.textContent = text;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  return div;                    // 👈 important
+}
+
 
   function basicAnswer(message) {
     const msg = message.toLowerCase();
@@ -1790,19 +1802,23 @@
     );
   }
 
-  function sendMessage() {
-    const text = inputEl.value.trim();
-    if (!text) return;
+ function sendMessage() {
+  const text = inputEl.value.trim();
+  if (!text) return;
 
-    addMessage(text, "user");
-    inputEl.value = "";
-    addMessage("Thinking...", "bot");
+  // user message
+  addMessage(text, "user");
+  inputEl.value = "";
 
-    setTimeout(() => {
-      const reply = basicAnswer(text);
-      messagesEl.lastChild.textContent = reply;
-    }, 400);
-  }
+  // bot temporary message
+  const thinkingMsg = addMessage("Thinking...", "bot");
+
+  setTimeout(() => {
+    const reply = basicAnswer(text);
+    thinkingMsg.textContent = reply;   // update this message only
+  }, 400);
+}
+
 
   sendBtn.onclick = sendMessage;
   inputEl.addEventListener("keydown", (e) => {
