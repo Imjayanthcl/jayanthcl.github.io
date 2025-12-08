@@ -873,6 +873,98 @@
         left: 20px !important;
       }
     }
+    /* Chatbot widget */
+#jayanth-chatbot {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-family: "Poppins", system-ui, sans-serif;
+  z-index: 9999;
+}
+
+#chat-toggle {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 10px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#chat-toggle::before {
+  content: "🧠";
+  font-size: 16px;
+}
+
+#chat-window {
+  display: none;
+  width: 320px;
+  height: 420px;
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+#chat-messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+
+.msg {
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  max-width: 90%;
+  white-space: pre-wrap;
+}
+
+.msg.user {
+  background: rgba(0, 217, 255, 0.15);
+  align-self: flex-end;
+}
+
+.msg.bot {
+  background: rgba(148, 163, 184, 0.2);
+  align-self: flex-start;
+}
+
+#chat-input-area {
+  display: flex;
+  border-top: 1px solid var(--border);
+  background: rgba(5, 5, 16, 0.9);
+}
+
+#chat-input {
+  flex: 1;
+  border: none;
+  padding: 8px;
+  font-size: 14px;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+}
+
+#chat-send {
+  border: none;
+  padding: 0 14px;
+  font-size: 14px;
+  cursor: pointer;
+  background: var(--primary);
+  color: #050510;
+  font-weight: 600;
+}
+
   </style>
 </head>
 <body>
@@ -1332,8 +1424,20 @@
       <a href="#" class="social-link"><i class="fab fa-x"></i></a>
       <a href="mailto:jayanthcl431049@gmail.com" class="social-link"><i class="fas fa-envelope"></i></a>
     </div>
+    <div id="jayanth-chatbot">
+  <div id="chat-toggle">💬 Ask Jayanth AI</div>
+  <div id="chat-window">
+    <div id="chat-messages"></div>
+    <div id="chat-input-area">
+      <input id="chat-input" type="text" placeholder="Ask me about Jayanth..." />
+      <button id="chat-send">Send</button>
+    </div>
+  </div>
+</div>
+
   
   </footer>
+  
 
   <!-- Particle.js Library -->
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
@@ -1428,5 +1532,283 @@
       }
     });
   </script>
+ <script>
+  const toggle = document.getElementById("chat-toggle");
+  const windowEl = document.getElementById("chat-window");
+  const messagesEl = document.getElementById("chat-messages");
+  const inputEl = document.getElementById("chat-input");
+  const sendBtn = document.getElementById("chat-send");
+
+  toggle.onclick = () => {
+    windowEl.style.display = windowEl.style.display === "block" ? "none" : "block";
+
+    // Optional: show a welcome message when opened the first time
+    if (!windowEl.dataset.opened) {
+      windowEl.dataset.opened = "true";
+      addMessage(
+        "Hi 👋, I’m Jayanth’s portfolio assistant.\nYou can ask about my skills, projects, education, certifications, languages, or contact details.",
+        "bot"
+      );
+    }
+  };
+
+  function addMessage(text, from) {
+    const div = document.createElement("div");
+    div.className = "msg " + from;
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function basicAnswer(message) {
+    const msg = message.toLowerCase();
+
+    // GREETINGS / INTRO / ABOUT
+    if (
+      /(hi|hello|hey|namaste|hola)/.test(msg) ||
+      msg.includes("who are you") ||
+      msg.includes("about you") ||
+      msg.includes("tell me about yourself") ||
+      msg.includes("introduce yourself") ||
+      msg.includes("self introduction")
+    ) {
+      return (
+        "I’m Jayanth C L, an MCA graduate from JNNCE (VTU) with strong interest in AI, machine learning and software development. " +
+        "I’ve built projects like YOLOv8-based fire detection, driver drowsiness detection, an object recognition robot, and an agriculture equipment rental system."
+      );
+    }
+
+    // CAREER OBJECTIVE
+    if (
+      msg.includes("career objective") ||
+      msg.includes("objective") ||
+      msg.includes("goal") && msg.includes("career")
+    ) {
+      return (
+        "My career objective is to secure a challenging and responsible position in software development or AI, " +
+        "where I can apply my technical and analytical skills, contribute to the organization’s success, and continuously learn and grow professionally."
+      );
+    }
+
+    // LOCATION
+    if (msg.includes("location") || msg.includes("where are you from") || msg.includes("from") && msg.includes("where") || msg.includes("based")) {
+      return "I am from Chikkamagaluru, Karnataka, India and currently based in Bengaluru.";
+    }
+
+    // CONTACT
+    if (
+      msg.includes("contact") ||
+      msg.includes("email") ||
+      msg.includes("phone") ||
+      msg.includes("whatsapp") ||
+      msg.includes("reach you")
+    ) {
+      return (
+        "You can contact me at:\n" +
+        "📧 Email: jayanthcl431049@gmail.com\n" +
+        "📱 Phone/WhatsApp: +91 9353418569\n" +
+        "🌍 Location: Chikkamagaluru / Bengaluru, Karnataka, India"
+      );
+    }
+
+    // EDUCATION - OVERALL
+    if (msg.includes("education") || msg.includes("study") || msg.includes("studies") || msg.includes("degree")) {
+      return (
+        "Education:\n" +
+        "• MCA (Master of Computer Applications), JNNCE (VTU), Shimoga — CGPA 9.0 (85%) [2023–2024]\n" +
+        "• BCA (Bachelor of Computer Applications), PESIAMS, Shimoga — 57% [2019–2022]"
+      );
+    }
+
+    // EDUCATION - MCA
+    if (msg.includes("mca")) {
+      return (
+        "I completed MCA (Master of Computer Applications) at JNNCE (under VTU) in Shimoga, " +
+        "with a CGPA of 9.0 (around 85%), during 2023–2024."
+      );
+    }
+
+    // EDUCATION - BCA
+    if (msg.includes("bca")) {
+      return (
+        "I completed BCA (Bachelor of Computer Applications) at PESIAMS, Shimoga, " +
+        "with 57% marks, between 2019–2022."
+      );
+    }
+
+    // SKILLS: PROGRAMMING
+    if (
+      msg.includes("skills") ||
+      msg.includes("skill set") ||
+      msg.includes("tech stack") ||
+      msg.includes("technologies") ||
+      msg.includes("programming languages")
+    ) {
+      return (
+        "Technical Skills:\n" +
+        "• Programming: Java, Python, HTML, CSS, PHP, JavaScript\n" +
+        "• Database: PL/SQL, MySQL\n" +
+        "• OS: Windows, Linux\n" +
+        "• Tools/Platforms: VS Code, Jupyter, MS Excel, Git/GitHub, AngularJS, Arduino, Android Studio\n" +
+        "• Concepts: AI/ML, Computer Vision\n" +
+        "• Soft Skills: Problem solving, Communication, Teamwork, Leadership, Adaptability"
+      );
+    }
+
+    // SPECIFIC: PROGRAMMING
+    if (msg.includes("java") || msg.includes("python") || msg.includes("html") || msg.includes("php") || msg.includes("javascript")) {
+      return (
+        "I work with Java, Python, HTML, CSS, PHP and JavaScript. These are used across my projects like fire detection, " +
+        "driver drowsiness detection, and my personal portfolio."
+      );
+    }
+
+    // SOFT SKILLS
+    if (msg.includes("soft skills") || msg.includes("communication") || msg.includes("teamwork") || msg.includes("leadership")) {
+      return (
+        "My soft skills include problem solving, communication, teamwork, leadership, and adaptability."
+      );
+    }
+
+    // PROJECTS OVERVIEW
+    if (msg.includes("projects") || (msg.includes("project") && !msg.includes("fire") && !msg.includes("drowsiness") && !msg.includes("robot") && !msg.includes("agriculture"))) {
+      return (
+        "Main projects:\n" +
+        "1️⃣ Intelligent Fire Detection with Automated Alerting System — YOLOv8, Python, AI/ML, Twilio\n" +
+        "2️⃣ Driver Drowsiness Detection and Alerting — Python, Computer Vision, Facial Recognition\n" +
+        "3️⃣ Object Recognition and Picking Robot — Arduino, Robotics, Object recognition\n" +
+        "4️⃣ Agriculture Equipment Rental System — Web & mobile app using HTML, CSS, PHP, JavaScript, MySQL\n" +
+        "5️⃣ Personal Portfolio Website — HTML, CSS, JavaScript"
+      );
+    }
+
+    // FIRE DETECTION PROJECT
+    if (msg.includes("fire") || msg.includes("smoke") || msg.includes("yolov8") || msg.includes("alerting system")) {
+      return (
+        "Intelligent Fire Detection with Automated Alerting System:\n" +
+        "• Tech: YOLOv8, Python, AI/ML, Deep Learning, Twilio, Computer Vision\n" +
+        "• Features: Real-time fire/smoke detection from video, triggers alerts via phone call, SMS, and WhatsApp.\n" +
+        "It focuses on safety and faster response using computer vision."
+      );
+    }
+
+    // DROWSINESS PROJECT
+    if (msg.includes("drowsiness") || msg.includes("driver") || msg.includes("fatigue") || msg.includes("sleepy") || msg.includes("eye tracking")) {
+      return (
+        "Driver Drowsiness Detection and Alerting:\n" +
+        "• Tech: Python, Computer Vision, Facial Recognition\n" +
+        "• Idea: Monitors driver’s eyes and facial features to detect signs of sleep/fatigue and triggers alerts to avoid accidents."
+      );
+    }
+
+    // OBJECT RECOGNITION ROBOT
+    if (msg.includes("robot") || msg.includes("robotics") || msg.includes("object recognition robot")) {
+      return (
+        "Object Recognition and Picking Robot:\n" +
+        "• Tech: Arduino, Robotics, Object recognition, Servo motors\n" +
+        "• Idea: A robotic prototype that detects, tracks, and picks objects accurately using sensors and programmed movements."
+      );
+    }
+
+    // AGRICULTURE EQUIPMENT RENTAL SYSTEM
+    if (msg.includes("agriculture") || msg.includes("agri") || msg.includes("rental system") || msg.includes("equipment rental")) {
+      return (
+        "Agriculture Equipment Rental System:\n" +
+        "• Tech: HTML, CSS, PHP, JavaScript, MySQL, Mobile App\n" +
+        "• Idea: A societal project to help farmers rent agricultural equipment via website and mobile application."
+      );
+    }
+
+    // PORTFOLIO PROJECT
+    if (msg.includes("portfolio") || msg.includes("this website") || msg.includes("personal portfolio")) {
+      return (
+        "Personal Portfolio:\n" +
+        "• Tech: HTML, CSS, JavaScript\n" +
+        "• Purpose: To showcase my projects, skills, education, certifications, and provide an easy way for recruiters to know me."
+      );
+    }
+
+    // CERTIFICATIONS
+    if (msg.includes("certification") || msg.includes("certifications") || msg.includes("courses") || msg.includes("completed any course")) {
+      return (
+        "Certifications:\n" +
+        "• Programming in Java (NPTEL) — OOP, encapsulation, inheritance, multithreading, applets, AWT\n" +
+        "• Programming in Python (Internshala) — Python basics, OOP, SQLite DB, GUI with PyQt\n" +
+        "• Introduction to DevOps (Simplilearn) — DevOps, Git/GitHub, Jenkins, Docker, Kubernetes\n" +
+        "• JavaScript Essentials 1 (Cisco) — Core JS: variables, functions, control flow, arrays, objects, web scripting\n" +
+        "• Research Paper Certificate — Intelligent Fire Detection System"
+      );
+    }
+
+    // SPECIFIC CERT NAMES
+    if (msg.includes("devops")) {
+      return "I completed 'Introduction to DevOps' from Simplilearn, covering DevOps concepts, Git & GitHub, Jenkins, Docker, and Kubernetes.";
+    }
+    if (msg.includes("nptel") || msg.includes("java certificate")) {
+      return "I have an NPTEL certification in Programming in Java, covering OOP concepts, encapsulation, inheritance, multithreading, applets, and AWT.";
+    }
+    if (msg.includes("internshala") || msg.includes("python certificate")) {
+      return "I completed a Programming in Python course from Internshala, covering Python basics, OOP, SQLite database, and GUI development with PyQt.";
+    }
+    if (msg.includes("javascript essentials") || msg.includes("cisco")) {
+      return "I completed JavaScript Essentials 1 from Cisco Networking Academy, focusing on core JavaScript concepts and basic web scripting.";
+    }
+    if (msg.includes("research paper") || msg.includes("paper") || msg.includes("publication")) {
+      return "I have a research/conference certificate related to my Intelligent Fire Detection System project.";
+    }
+
+    // LANGUAGES SPOKEN
+    if (msg.includes("languages you know") || msg.includes("speak") || msg.includes("language") && !msg.includes("programming")) {
+      return "I can communicate in English (Fluent), Kannada (Native), Hindi (Intermediate), and Japanese (Basic).";
+    }
+
+    // JOB / GOOGLE / COMPANIES
+    if (msg.includes("job") || msg.includes("google") || msg.includes("accenture") || msg.includes("company") || msg.includes("hire you") || msg.includes("why should we hire you")) {
+      return (
+        "I’m preparing for roles in software development and AI/ML, targeting companies like Google, Accenture and other reputed organizations. " +
+        "I bring strong academic performance (MCA CGPA 9.0), solid AI projects, and good problem solving & communication skills."
+      );
+    }
+
+    // DECLARATION / HONESTY
+    if (msg.includes("declaration") || msg.includes("true") || msg.includes("correct")) {
+      return "I confirm that all details in my resume and this portfolio are true and correct to the best of my knowledge.";
+    }
+
+    // DEFAULT FALLBACK
+    return (
+      "That’s an interesting question! 🙂 I’m a simple portfolio assistant, so I mainly know about Jayanth’s skills, " +
+      "projects, education, certifications, languages, and contact details.\n\n" +
+      "You can try asking things like:\n" +
+      "• What are your skills?\n" +
+      "• Tell me about your fire detection project\n" +
+      "• What is your education?\n" +
+      "• What certifications do you have?\n" +
+      "• How can I contact you?\n" +
+      "• What languages do you speak?\n" +
+      "• What is your career objective?"
+    );
+  }
+
+  function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    addMessage(text, "user");
+    inputEl.value = "";
+    addMessage("Thinking...", "bot");
+
+    setTimeout(() => {
+      const reply = basicAnswer(text);
+      messagesEl.lastChild.textContent = reply;
+    }, 400);
+  }
+
+  sendBtn.onclick = sendMessage;
+  inputEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
+</script>
+
 </body>
 </html>
